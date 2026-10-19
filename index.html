@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carto – Cartomancie</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f4fc;--fg:#2b2540;--muted:#6a6486;--gold:#98721c;--face:#ffffff;--red:#b3261e;--ink:#2b2540;--b1:#9a8bdc;--b2:#6c5bb5;--line:#ddd7ec;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Cormorant Garamond",Georgia,"Times New Roman",serif;font-size:19px;line-height:1.5}
+main{max-width:560px;margin:0 auto;padding:28px 16px 40px}
+h1{font-size:2.4rem;font-weight:700;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 20px;font-style:italic}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.seg{display:inline-flex;border:1px solid var(--gold);border-radius:999px;overflow:hidden}
+.seg button{background:none;border:0;color:var(--fg);font:inherit;padding:7px 15px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--gold);color:var(--bg)}
+.btn{background:var(--fg);color:var(--bg);border:0;border-radius:999px;font:inherit;font-weight:700;padding:9px 22px;cursor:pointer}
+.btn.alt{background:none;color:var(--fg);border:1px solid var(--gold);font-weight:500}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+textarea{width:100%;font:inherit;background:transparent;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical}
+label.chk{display:flex;gap:8px;align-items:center;color:var(--muted)}
+[hidden]{display:none!important}
+#spread{margin:22px 0 6px;overflow-x:auto}
+.lv{display:flex;gap:8px;justify-content:center;margin-bottom:12px;min-width:max-content;margin-inline:auto}
+.slot{width:min(74px,20vw);min-width:58px;text-align:center}
+.card{display:block;width:100%;aspect-ratio:2/3;perspective:900px;background:none;border:0;padding:0;cursor:pointer}
+.inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.card.up .inner{transform:rotateY(180deg)}
+.face,.back{position:absolute;inset:0;border-radius:8px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.back{background:repeating-linear-gradient(45deg,transparent 0 7px,rgba(211,173,85,.22) 7px 8px),repeating-linear-gradient(-45deg,transparent 0 7px,rgba(211,173,85,.22) 7px 8px),linear-gradient(160deg,var(--b1),var(--b2));border:2px solid var(--gold);box-shadow:inset 0 0 0 4px var(--b2),inset 0 0 0 5px var(--gold)}
+.face{transform:rotateY(180deg);background:var(--face);color:var(--ink);border:1px solid var(--line);display:grid;place-items:center;font-weight:700}
+.face.red{color:var(--red)}
+.face .c{position:absolute;top:4px;left:6px;line-height:1;font-size:1rem;text-align:center}
+.face .big{font-size:2rem;line-height:1}
+.cap{font-size:.8rem;line-height:1.15;color:var(--muted);margin-top:4px;min-height:2.3em}
+.num{position:absolute;inset:0;display:grid;place-items:center;font-size:1.5rem;font-weight:700;color:var(--face)}
+.card.sel .inner{outline:2px solid var(--gold);outline-offset:3px;border-radius:8px}
+.picker{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:14px;background:var(--face)}
+.ptitle{font-weight:700;margin-bottom:8px;color:var(--ink)}
+.pgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.pk{font:inherit;font-weight:700;font-size:.95rem;padding:8px 0;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);cursor:pointer}
+.pk.red{color:var(--red)}
+.pk:disabled{opacity:.25;cursor:default}
+.slot{position:relative}
+.lv.d .slot{width:min(70px,calc((100vw - 68px)/7));min-width:38px}
+.lv.d .cap{font-size:.62rem}
+.lv.d .big{font-size:1.4rem}
+.lv.d .face .c{font-size:.8rem;top:3px;left:4px}
+.cap{white-space:pre-line}
+.cv{position:absolute;top:12px;left:14px;width:100%;aspect-ratio:2/3;transform:rotate(7deg);z-index:2;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+.cv .face{transform:none}
+.cov{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+select{font:inherit;background:var(--face);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 8px;max-width:100%}
+.hint{color:var(--muted);font-style:italic;margin:10px 0 0}
+.read{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);white-space:pre-wrap;font-size:1.05rem;line-height:1.45}
+.err{color:var(--red)}
+footer{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
+@media (prefers-reduced-motion:reduce){.inner{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Carto</h1>
+<p class="lead">Cartomancie traditionnelle, jeu de 32 cartes.</p>
+
+<div class="row"><div class="seg" id="type" role="group" aria-label="Type de tirage">
+  <button type="button" data-v="open" aria-pressed="false">Ouverture</button>
+  <button type="button" data-v="line" aria-pressed="true">Ligne</button>
+  <button type="button" data-v="pyr" aria-pressed="false">Pyramide</button>
+</div></div>
+
+<div id="optLine">
+  <div class="row">
+    <div class="seg" id="sub" role="group" aria-label="Sous-type"><button type="button" data-v="q" aria-pressed="true">Question</button><button type="button" data-v="next" aria-pressed="false">Prochainement</button></div>
+  </div>
+  <label class="chk"><input type="checkbox" id="nocov"> Sans couverture</label>
+</div>
+
+<div id="qbox" class="row" style="margin-top:12px"><textarea id="question" rows="2" placeholder="Votre question ouverte"></textarea></div>
+
+<div class="row" style="margin-top:14px">
+  <button type="button" class="btn" id="draw">Saisir mon tirage</button>
+</div>
+
+<div id="spread" aria-live="polite"></div>
+<div id="picker" class="picker" hidden><div class="ptitle" id="ptitle"></div><div class="pgrid" id="pgrid"></div></div>
+<p class="hint" id="hint"></p>
+
+<div class="row" style="margin-top:16px"><button type="button" class="btn" id="read" hidden>Interpréter le tirage</button></div>
+<div class="read" id="out" hidden></div>
+
+<div class="cov" id="cov" hidden>
+  <div class="ptitle">Couvertures</div>
+  <p class="hint" style="margin:0 0 12px">Tirez vos couvertures (3 maximum) dans le paquet restant, puis indiquez la carte couverte et la couverture posée dessus.</p>
+  <div id="covrows"></div>
+  <div class="row" id="covbtns">
+    <button type="button" class="btn alt" id="addcov">Ajouter une couverture</button>
+    <button type="button" class="btn" id="cont" hidden>Poursuivre l’interprétation</button>
+  </div>
+</div>
+<div class="read" id="out2" hidden></div>
+
+<footer>Interprétation générée par Claude selon les règles de la cartomancie traditionnelle. Proposée pour le plaisir et la réflexion.</footer>
+</main>
+
+<script>
+(function(){
+var PROMPT=`Tu es un expert en cartomancie traditionnelle, basé exclusivement sur les ouvrages « La Cartomancie pratique — Tirages et interprétation » de Liliane Souvay, « Le livre de Lydia » de Florence Eymon, « Toutes les combinaisons du jeu de 32 cartes » de Sylvie Lacombe, « Le grand livre de la cartomancie : Le jeu de 32 cartes » de Colette Silvestre, « La cartomancie : Lire l'avenir dans un jeu de 32 cartes » de Corinne Morel, « Le jeu de 32 cartes : Pratique de la cartomancie traditionnelle » de Marie-Delphine Malachard, « L'art de la cartomancie : Apprendre à lire avec un simple jeu de cartes » de Maud Kristen, « Le guide pratique du jeu la voyante » de Stéphanie Bellecourt et « Votre avenir en 32 cartes » de Valérie Auterive.
+
+RÈGLES GÉNÉRALES
+
+Chaque tirage est indépendant des précédents : ne fais aucun lien entre les séances.
+Les cartes sont toujours à l'endroit — aucune interprétation en position renversée.
+Les cartes sont toujours annoncées de gauche à droite.
+Le Valet de Pique est systématiquement interprété en « expédie » dans tous les cas.
+L'interprétation suit toujours cet ordre :
+Carte par carte — signification individuelle
+Associations — lecture des combinaisons entre les cartes
+Répétitions — si plusieurs cartes de même valeur ou même couleur apparaissent, signale leur effet amplificateur ou leur signification collective (ex. : trois Rois, quatre cartes de cœur, etc.). Si aucune répétition notable, indiquer simplement : « Aucune répétition significative. »
+Résumé — synthèse globale du tirage en 3 à 5 phrases, dégageant le message principal et le ton général de la lecture.
+
+TYPE 1 — TIRAGE D'OUVERTURE (4 cartes × 2 lignes = 8 cartes)
+Je t'annonce d'abord la ligne du haut (cartes 1 à 4, gauche à droite), puis la ligne du bas (cartes 5 à 8, gauche à droite). Pas de couverture à proposer pour ce type de tirage.
+
+TYPE 2 — TIRAGE ORIENTÉ (ligne unique)
+Ce type recouvre deux sous-cas, que je précise à chaque fois :
+2a — Question : je pose une question ouverte. Les cartes éclairent la situation, les dynamiques en jeu et les tendances, sans se limiter à une réponse binaire.
+2b — Prochainement : pas de question ; les cartes éclairent ce qui se profile dans un avenir proche.
+2c — Sans couverture : je peux associer ce modificateur à 2a ou 2b (ex. : « 2a sans couverture » ou « 2b sans couverture ») pour indiquer qu'aucune proposition de couverture n'est souhaitée. La section ⑤ est alors omise.
+Dans les deux cas (2a ou 2b, avec ou sans modificateur 2c) : je t'indique le sous-type, puis les cartes de gauche à droite. Sauf mention « sans couverture », propose entre 1 et 3 cartes de couverture maximum à la fin de l'interprétation, par ordre de priorité. Pour chacune, indique : — quelle carte elle vient couvrir et pourquoi, — ce qu'elle est susceptible d'apporter comme précision ou nuance.
+
+TYPE 3 — TIRAGE EN PYRAMIDE (question)
+Le tirage se présente en 4 niveaux, lus de bas en haut, chaque niveau de gauche à droite :
+Niveau 1 (base) — cartes 1 à 4
+Niveau 2 — cartes 5 à 7
+Niveau 3 — cartes 8 à 9
+Niveau 4 (sommet) — carte 10
+Je t'annonce les cartes niveau par niveau, du bas vers le haut.
+Je pose une question ouverte. Les cartes éclairent la situation, les dynamiques en jeu et les tendances, sans se limiter à une réponse binaire.
+La carte du sommet n'a pas de rôle particulier : elle est interprétée comme toute autre carte du tirage.
+Les couvertures sont toujours proposées pour ce type de tirage, entre 1 et 3 maximum, par ordre de priorité. Pour chacune, indiquer : — quelle carte elle vient couvrir et pourquoi, — ce qu'elle est susceptible d'apporter comme précision ou nuance.
+
+FORMAT DE RÉPONSE ATTENDU
+
+① INTERPRÉTATION CARTE PAR CARTE
+   [Carte 1] — ...
+   [Carte 2] — ...
+   etc.
+
+② ASSOCIATIONS
+   [Cartes X + Y] — ...
+   etc.
+
+③ RÉPÉTITIONS NOTABLES
+   [même valeur / même couleur] — effet amplificateur ou signification collective
+   — ou : Aucune répétition significative.
+
+④ RÉSUMÉ DU TIRAGE
+   Synthèse globale en 3 à 5 phrases, dégageant le message principal, le ton général de la lecture et le lien avec la question posée (pour les Types 2a et 3) ou la période annoncée (pour le Type 2b).
+
+⑤ COUVERTURES SUGGÉRÉES  ← Types 2a, 2b et 3 uniquement (sauf mention « sans couverture » pour le Type 2)
+   [Couverture 1] — carte à recouvrir : [X] / raison : ... / apport attendu : ...
+   [Couverture 2] — ... (si pertinent)
+   [Couverture 3] — ... (si pertinent)`;
+
+var RANKS=[["7","7"],["8","8"],["9","9"],["10","10"],["V","Valet"],["D","Dame"],["R","Roi"],["A","As"]];
+var SUITS=[["♥","Cœur",1],["♣","Trèfle",0],["♦","Carreau",1],["♠","Pique",0]];
+var DECK=[];
+SUITS.forEach(function(s){RANKS.forEach(function(r){DECK.push({k:r[0],n:r[1],s:s[0],sn:s[1],red:s[2]});});});
+
+var $=function(i){return document.getElementById(i);};
+var st={type:"line",sub:"q",cnt:7,cards:[],sample:null};
+var spread=$("spread"),out=$("out");
+
+function nm(c){return c.n+" de "+c.sn;}
+function needsQ(){return st.type==="pyr"||(st.type==="line"&&st.sub==="q");}
+function seg(id,key,num){
+  var bs=$(id).querySelectorAll("button");
+  bs.forEach(function(b){b.addEventListener("click",function(){
+    st[key]=num?parseInt(b.dataset.v,10):b.dataset.v;
+    bs.forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});
+    clear();sync();
+  });});
+}
+function sync(){
+  $("optLine").hidden=st.type!=="line";
+  $("qbox").hidden=!needsQ();
+}
+function clear(){st.cards=[];spread.innerHTML="";out.hidden=true;$("read").hidden=true;$("picker").hidden=true;$("hint").textContent="";clearCov();$("cov").hidden=true;}
+
+function layout(){
+  if(st.type==="open")return [[0,1,2,3],[4,5,6,7]];
+  if(st.type==="line"){var a=[];for(var i=0;i<st.cnt;i++)a.push(i);return [a];}
+  return [[9],[7,8],[4,5,6],[0,1,2,3]];
+}
+function prepare(){
+  var n=st.type==="open"?8:st.type==="pyr"?10:st.cnt;
+  st.cards=[];for(var i=0;i<n;i++)st.cards.push(null);
+  clearCov();$("cov").hidden=true;out.hidden=true;$("read").hidden=true;spread.innerHTML="";
+  layout().forEach(function(row){
+    var lv=document.createElement("div");lv.className="lv"+(row.length>=7?" d":"");
+    row.forEach(function(ix){
+      var s=document.createElement("div");s.className="slot";
+      var b=document.createElement("button");b.type="button";b.className="card";b.id="s"+ix;
+      b.setAttribute("aria-label","Choisir la carte "+(ix+1));
+      b.innerHTML='<div class="inner"><div class="back"><span class="num">'+(ix+1)+'</span></div><div class="face"></div></div>';
+      var cap=document.createElement("div");cap.className="cap";cap.id="p"+ix;
+      b.addEventListener("click",function(){openPicker(ix);});
+      s.appendChild(b);s.appendChild(cap);lv.appendChild(s);
+    });
+    spread.appendChild(lv);
+  });
+  $("hint").textContent=st.type==="pyr"?"Positions numérotées : lecture de bas en haut, de gauche à droite.":"Positions numérotées : lecture de gauche à droite.";
+  openPicker(0);
+}
+function openPicker(ix){
+  var used={};st.cards.forEach(function(c,i){if(c&&i!==ix)used[nm(c)]=1;});
+  spread.parentNode.insertBefore($("picker"),$("hint"));$("picker").hidden=false;$("ptitle").textContent="Carte n° "+(ix+1);
+  var g=$("pgrid");g.innerHTML="";
+  SUITS.forEach(function(su){RANKS.forEach(function(r){
+    var c={k:r[0],n:r[1],s:su[0],sn:su[1],red:su[2]};
+    var b=document.createElement("button");b.type="button";b.className="pk"+(c.red?" red":"");
+    b.textContent=r[0]+su[0];b.setAttribute("aria-label",nm(c));
+    if(used[nm(c)])b.disabled=true;
+    b.addEventListener("click",function(){setCard(ix,c);});
+    g.appendChild(b);
+  });});
+  document.querySelectorAll(".card").forEach(function(x){x.classList.remove("sel");});
+  $("s"+ix).classList.add("sel");
+}
+function setCard(ix,c){
+  st.cards[ix]=c;
+  var b=$("s"+ix),f=b.querySelector(".face");
+  f.className="face"+(c.red?" red":"");
+  f.innerHTML='<span class="c">'+c.k+'<br>'+c.s+'</span><span class="big">'+c.s+'</span>';
+  b.classList.add("up");$("p"+ix).textContent=nm(c);b.setAttribute("aria-label",nm(c)+", modifier");
+  var next=st.cards.indexOf(null);
+  if(next>=0){openPicker(next);return;}
+  $("picker").hidden=true;
+  document.querySelectorAll(".card").forEach(function(x){x.classList.remove("sel");});
+  $("read").hidden=!st.sample;
+  $("hint").textContent="Tirage complet. Touchez une carte pour la corriger.";
+}
+function clearCov(){
+  st.covers=[];st.hist=null;
+  spread.parentNode.insertBefore($("picker"),$("hint"));
+  $("covrows").innerHTML="";$("cont").hidden=true;$("cont").disabled=false;$("addcov").hidden=false;$("out2").hidden=true;
+  renderCov();
+}
+function covApplies(){return st.type==="pyr"||(st.type==="line"&&!$("nocov").checked);}
+function renderCov(){
+  document.querySelectorAll(".cv").forEach(function(x){x.remove();});
+  st.cards.forEach(function(c,i){var cap=$("p"+i);if(cap&&c)cap.textContent=nm(c);});
+  st.covers.forEach(function(v){
+    if(!v.card)return;
+    var slot=$("s"+v.on).parentNode,d=document.createElement("div");d.className="cv";
+    d.innerHTML='<div class="face'+(v.card.red?" red":"")+'"><span class="c">'+v.card.k+'<br>'+v.card.s+'</span><span class="big">'+v.card.s+'</span></div>';
+    slot.appendChild(d);
+    $("p"+v.on).textContent+="\n+ "+nm(v.card);
+  });
+}
+function addCov(){
+  if(st.covers.length>=3)return;
+  var ci=st.covers.length;st.covers.push({on:0,card:null});
+  var row=document.createElement("div");row.className="row";
+  var sel=document.createElement("select");sel.setAttribute("aria-label","Carte couverte");
+  st.cards.forEach(function(c,i){var o=document.createElement("option");o.value=i;o.textContent="Sur la carte n° "+(i+1)+" ("+nm(c)+")";sel.appendChild(o);});
+  sel.addEventListener("change",function(){st.covers[ci].on=parseInt(sel.value,10);renderCov();});
+  var b=document.createElement("button");b.type="button";b.className="btn alt";b.id="cb"+ci;b.textContent="Choisir la couverture "+(ci+1);
+  b.addEventListener("click",function(){openCovPicker(ci);});
+  row.appendChild(sel);row.appendChild(b);$("covrows").appendChild(row);
+  $("addcov").hidden=st.covers.length>=3;
+  openCovPicker(ci);
+}
+function openCovPicker(ci){
+  var used={};
+  st.cards.forEach(function(c){if(c)used[nm(c)]=1;});
+  st.covers.forEach(function(v,i){if(v.card&&i!==ci)used[nm(v.card)]=1;});
+  var pk=$("picker");$("cov").insertBefore(pk,$("covbtns"));pk.hidden=false;
+  $("ptitle").textContent="Couverture n° "+(ci+1);
+  var g=$("pgrid");g.innerHTML="";
+  SUITS.forEach(function(su){RANKS.forEach(function(r){
+    var c={k:r[0],n:r[1],s:su[0],sn:su[1],red:su[2]};
+    var b=document.createElement("button");b.type="button";b.className="pk"+(c.red?" red":"");
+    b.textContent=r[0]+su[0];b.setAttribute("aria-label",nm(c));
+    if(used[nm(c)])b.disabled=true;
+    b.addEventListener("click",function(){setCov(ci,c);});
+    g.appendChild(b);
+  });});
+}
+function setCov(ci,c){
+  st.covers[ci].card=c;
+  $("cb"+ci).textContent="Couverture "+(ci+1)+" : "+nm(c);
+  $("picker").hidden=true;$("cont").hidden=false;
+  renderCov();
+}
+function cont(){
+  var cv=st.covers.filter(function(v){return v.card;});
+  if(!cv.length||!st.hist)return;
+  var msg="COUVERTURES POSÉES\n"+cv.map(function(v,i){return "Couverture "+(i+1)+" : "+nm(v.card)+", posée sur la carte n° "+(v.on+1)+" ("+nm(st.cards[v.on])+")";}).join("\n")+"\n\nContinue l'interprétation : pour chaque carte couverte, donne sa lecture avec sa couverture (précision ou nuance apportée), puis une synthèse mise à jour du tirage. Ne propose pas de nouvelles couvertures.";
+  var o=$("out2");o.hidden=false;o.classList.remove("err");o.textContent="Interprétation en cours…";$("cont").disabled=true;
+  st.sample([{role:"user",content:st.hist.q},{role:"assistant",content:st.hist.a},{role:"user",content:msg}],{cache:false,onText:function(t){o.textContent=t.text;}}).then(function(r){
+    o.textContent=r.text;
+  }).catch(function(e){
+    o.classList.add("err");
+    o.textContent=e&&e.code==="rate_limited"?"Trop de demandes : réessayez dans un instant.":"L’interprétation n’a pas pu aboutir"+(e&&e.message?" ("+e.message+")":"")+".";
+  }).then(function(){$("cont").disabled=false;});
+}
+function brief(){
+  var c=st.cards.map(nm),q=$("question").value.trim(),L;
+  if(st.type==="open"){
+    L="TYPE 1 — Tirage d'ouverture\nLigne du haut (cartes 1 à 4) : "+c.slice(0,4).join(", ")+"\nLigne du bas (cartes 5 à 8) : "+c.slice(4).join(", ");
+  }else if(st.type==="line"){
+    L="TYPE 2"+(st.sub==="q"?"a — Question : "+q:"b — Prochainement")+($("nocov").checked?" — sans couverture":"")+"\nCartes de gauche à droite : "+c.join(", ");
+  }else{
+    L="TYPE 3 — Tirage en pyramide\nQuestion : "+q+"\nNiveau 1 (cartes 1 à 4) : "+c.slice(0,4).join(", ")+"\nNiveau 2 (cartes 5 à 7) : "+c.slice(4,7).join(", ")+"\nNiveau 3 (cartes 8 à 9) : "+c.slice(7,9).join(", ")+"\nNiveau 4 (carte 10) : "+c[9];
+  }
+  return PROMPT+"\n\nTIRAGE À INTERPRÉTER\n"+L+"\n\nRéponds directement par l'interprétation, au format demandé.";
+}
+function interpret(){
+  if(needsQ()&&!$("question").value.trim()){$("question").focus();$("hint").textContent="Saisissez d’abord votre question.";return;}
+  if(st.cards.indexOf(null)>=0)return;out.hidden=false;out.classList.remove("err");out.textContent="Interprétation en cours…";
+  $("read").disabled=true;
+  var q=brief();clearCov();st.sample(q,{cache:false,onText:function(t){out.textContent=t.text;}}).then(function(r){
+    out.textContent=r.text;st.hist={q:q,a:r.text};if(covApplies())$("cov").hidden=false;
+  }).catch(function(e){
+    out.classList.add("err");
+    out.textContent=e&&e.code==="rate_limited"?"Trop de demandes : réessayez dans un instant.":"L’interprétation n’a pas pu aboutir"+(e&&e.message?" ("+e.message+")":"")+".";
+  }).then(function(){$("read").disabled=false;});
+}
+
+seg("type","type");seg("sub","sub");
+$("addcov").addEventListener("click",addCov);$("cont").addEventListener("click",cont);
+$("draw").addEventListener("click",prepare);
+$("read").addEventListener("click",interpret);
+sync();
+if(window.claude&&claude.use){claude.use("sample").then(function(s){
+  st.sample=s;if(st.cards.length&&st.cards.indexOf(null)<0)$("read").hidden=!s;
+}).catch(function(){});}
+})();
+</script>
+</body>
+</html>
